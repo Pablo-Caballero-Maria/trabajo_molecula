@@ -1,0 +1,61 @@
+Molecula de consulta: Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1 | bits a 1: 43 
+
+==============================================================================
+CDS16  (82 moleculas)
+==============================================================================
+
+-- umbral T = 0.8  |  cota de bits [34, 53]  |  required bits = 10
+   candidatos tras el filtro: 9 de 82 (11.0 %)
+   moleculas recuperadas: 1  |  agregacion 4.6 ms  vs  fuerza bruta 1.7 ms (x0.4)  |  mismo resultado: True
+     1.0000  1          Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1
+
+-- umbral T = 0.6  |  cota de bits [25, 71]  |  required bits = 19
+   candidatos tras el filtro: 27 de 82 (32.9 %)
+   moleculas recuperadas: 1  |  agregacion 3.7 ms  vs  fuerza bruta 1.4 ms (x0.4)  |  mismo resultado: True
+     1.0000  1          Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1
+
+-- umbral T = 0.4  |  cota de bits [17, 107]  |  required bits = 27
+   candidatos tras el filtro: 45 de 82 (54.9 %)
+   moleculas recuperadas: 6  |  agregacion 2.9 ms  vs  fuerza bruta 1.2 ms (x0.4)  |  mismo resultado: True
+     1.0000  1          Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1
+     0.4906  54.0       Nc1ccn(C2OC(CO)C(O)C2O)c(=O)n1
+     0.4727  44.0       Nc1nc2c(ncn2COCCO)c(=O)[nH]1
+     0.4561  56.0       Nc1nc2c(ncn2COC(CO)CO)c(=O)[nH]1
+     0.4237  12.0       CC#Cc1cn(C2OC(CO)C(O)C2O)c(=O)[nH]c1=O
+     ... (1 mas)
+
+-- umbral T = 0.3  |  cota de bits [12, 143]  |  required bits = 32
+   candidatos tras el filtro: 63 de 82 (76.8 %)
+   moleculas recuperadas: 8  |  agregacion 3.6 ms  vs  fuerza bruta 1.2 ms (x0.3)  |  mismo resultado: True
+     1.0000  1          Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1
+     0.4906  54.0       Nc1ccn(C2OC(CO)C(O)C2O)c(=O)n1
+     0.4727  44.0       Nc1nc2c(ncn2COCCO)c(=O)[nH]1
+     0.4561  56.0       Nc1nc2c(ncn2COC(CO)CO)c(=O)[nH]1
+     0.4237  12.0       CC#Cc1cn(C2OC(CO)C(O)C2O)c(=O)[nH]c1=O
+     ... (3 mas)
+==============================================================================
+CDS29  (7015 moleculas)
+==============================================================================
+
+-- umbral T = 0.8  |  cota de bits [34, 53]  |  required bits = 10
+   candidatos tras el filtro: 407 de 7015 (5.8 %)
+   moleculas recuperadas: 0  |  agregacion 7.1 ms  vs  fuerza bruta 68.1 ms (x9.6)  |  mismo resultado: True
+
+-- umbral T = 0.6  |  cota de bits [25, 71]  |  required bits = 19
+   candidatos tras el filtro: 1404 de 7015 (20.0 %)
+   moleculas recuperadas: 1  |  agregacion 18.2 ms  vs  fuerza bruta 55.5 ms (x3.0)  |  mismo resultado: True
+     0.6154  mol2246    Nc1nc(F)nc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O
+
+-- umbral T = 0.4  |  cota de bits [17, 107]  |  required bits = 27
+   candidatos tras el filtro: 3229 de 7015 (46.0 %)
+   moleculas recuperadas: 2  |  agregacion 38.7 ms  vs  fuerza bruta 53.7 ms (x1.4)  |  mismo resultado: True
+     0.6154  mol2246    Nc1nc(F)nc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O
+     0.4386  mol2248    Nc1ncnc2c1ccn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O
+
+-- umbral T = 0.3  |  cota de bits [12, 143]  |  required bits = 32
+   candidatos tras el filtro: 5029 de 7015 (71.7 %)
+   moleculas recuperadas: 2  |  agregacion 58.7 ms  vs  fuerza bruta 52.9 ms (x0.9)  |  mismo resultado: True
+     0.6154  mol2246    Nc1nc(F)nc2c1ncn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O
+     0.4386  mol2248    Nc1ncnc2c1ccn2[C@@H]1O[C@H](CO)[C@@H](O)[C@H]1O
+
+Resumen guardado en screening_resultados.json

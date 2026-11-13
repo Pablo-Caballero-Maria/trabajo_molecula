@@ -1,0 +1,146 @@
+Cargados 5 departamentos y 18 empleados.
+
+Prueba de validación -> inserción rechazada: Document failed validation (regla 'properties', propiedad 'sal': minimum = {'minimum': 0})
+
+Referencias deptno huérfanas: [] | referencias mgr huérfanas: [] 
+
+==============================================================================
+Q1. Empleados con su departamento ($lookup emp -> dept)
+==============================================================================
+empno  ename   job        sal   dname        loc     
+-----  ------  ---------  ----  -----------  --------
+8004   LOPEZ   CLERK      1150  (sin dept.)  -       
+7839   KING    PRESIDENT  5000  ACCOUNTING   NEW YORK
+7782   CLARK   MANAGER    2450  ACCOUNTING   NEW YORK
+7934   MILLER  CLERK      1300  ACCOUNTING   NEW YORK
+8001   MORENO  MANAGER    3100  IOT LAB      SEVILLA 
+8002   GARCIA  ANALYST    2600  IOT LAB      SEVILLA 
+8003   ROMERO  ANALYST    2400  IOT LAB      SEVILLA 
+7788   SCOTT   ANALYST    3000  RESEARCH     DALLAS  
+7902   FORD    ANALYST    3000  RESEARCH     DALLAS  
+7566   JONES   MANAGER    2975  RESEARCH     DALLAS  
+7876   ADAMS   CLERK      1100  RESEARCH     DALLAS  
+7369   SMITH   CLERK      800   RESEARCH     DALLAS  
+7698   BLAKE   MANAGER    2850  SALES        CHICAGO 
+7499   ALLEN   SALESMAN   1600  SALES        CHICAGO 
+7844   TURNER  SALESMAN   1500  SALES        CHICAGO 
+7654   MARTIN  SALESMAN   1250  SALES        CHICAGO 
+7521   WARD    SALESMAN   1250  SALES        CHICAGO 
+7900   JAMES   CLERK      950   SALES        CHICAGO 
+
+==============================================================================
+Q2. Resumen salarial por departamento ($lookup dept -> emp)
+==============================================================================
+deptno  dname       loc       n_emp  masa_salarial  sal_medio  sal_max
+------  ----------  --------  -----  -------------  ---------  -------
+10      ACCOUNTING  NEW YORK  3      8750           2916.67    5000   
+20      RESEARCH    DALLAS    5      10875          2175.0     3000   
+30      SALES       CHICAGO   6      9400           1566.67    2850   
+40      OPERATIONS  BOSTON    0      0              0          0      
+50      IOT LAB     SEVILLA   3      8100           2700.0     3100   
+
+==============================================================================
+Q3. Empleado y jefe directo (relación reflexiva "Subordinado de")
+==============================================================================
+empno  ename   job        jefe       job_jefe 
+-----  ------  ---------  ---------  ---------
+7839   KING    PRESIDENT  (ninguno)  -        
+7499   ALLEN   SALESMAN   BLAKE      MANAGER  
+7900   JAMES   CLERK      BLAKE      MANAGER  
+7654   MARTIN  SALESMAN   BLAKE      MANAGER  
+7844   TURNER  SALESMAN   BLAKE      MANAGER  
+7521   WARD    SALESMAN   BLAKE      MANAGER  
+8004   LOPEZ   CLERK      CLARK      MANAGER  
+7934   MILLER  CLERK      CLARK      MANAGER  
+7369   SMITH   CLERK      FORD       ANALYST  
+7902   FORD    ANALYST    JONES      MANAGER  
+7788   SCOTT   ANALYST    JONES      MANAGER  
+7698   BLAKE   MANAGER    KING       PRESIDENT
+7782   CLARK   MANAGER    KING       PRESIDENT
+7566   JONES   MANAGER    KING       PRESIDENT
+8001   MORENO  MANAGER    KING       PRESIDENT
+8002   GARCIA  ANALYST    MORENO     MANAGER  
+8003   ROMERO  ANALYST    MORENO     MANAGER  
+7876   ADAMS   CLERK      SCOTT      ANALYST  
+
+==============================================================================
+Q4. Jefes y número de subordinados directos ("Es jefe")
+==============================================================================
+empno  jefe    n_subordinados  subordinados                      
+-----  ------  --------------  ----------------------------------
+7698   BLAKE   5               ALLEN, WARD, MARTIN, TURNER, JAMES
+7839   KING    4               JONES, BLAKE, CLARK, MORENO       
+7782   CLARK   2               MILLER, LOPEZ                     
+7566   JONES   2               SCOTT, FORD                       
+8001   MORENO  2               GARCIA, ROMERO                    
+7902   FORD    1               SMITH                             
+7788   SCOTT   1               ADAMS                             
+
+==============================================================================
+Q5. Organigrama recursivo bajo JONES ($graphLookup)
+==============================================================================
+nivel  empno  ename  job    
+-----  -----  -----  -------
+1      7902   FORD   ANALYST
+1      7788   SCOTT  ANALYST
+2      7876   ADAMS  CLERK  
+2      7369   SMITH  CLERK  
+
+==============================================================================
+Q6. Cadena de mando de ADAMS hasta la cima ($graphLookup ascendente)
+==============================================================================
+nivel  ename  job      
+-----  -----  ---------
+1      SCOTT  ANALYST  
+2      JONES  MANAGER  
+3      KING   PRESIDENT
+
+==============================================================================
+Q7. Empleados cuyo salario es igual o superior al de su jefe
+==============================================================================
+ename  sal   jefe   sal_jefe
+-----  ----  -----  --------
+SCOTT  3000  JONES  2975    
+FORD   3000  JONES  2975    
+
+==============================================================================
+Q8. Retribución total de los SALESMAN (sal + comm)
+==============================================================================
+ename   sal   comm  total
+------  ----  ----  -----
+MARTIN  1250  1400  2650 
+WARD    1250  500   1750 
+ALLEN   1600  300   1900 
+TURNER  1500  0     1500 
+
+==============================================================================
+Q9. Contrataciones por año ($year + $group)
+==============================================================================
+anio  n   puestos                                     
+----  --  --------------------------------------------
+1980  1   CLERK                                       
+1981  10  ANALYST, CLERK, MANAGER, PRESIDENT, SALESMAN
+1982  1   CLERK                                       
+1987  2   ANALYST, CLERK                              
+2022  1   MANAGER                                     
+2023  1   ANALYST                                     
+2024  1   ANALYST                                     
+2025  1   CLERK                                       
+
+==============================================================================
+Q10. Casos límite de las cardinalidades (0,1) y (0,N)
+==============================================================================
+Empleados sin departamento : ['LOPEZ']
+Empleados sin jefe         : ['KING']
+Departamentos sin empleados: ['OPERATIONS'] 
+
+==============================================================================
+Q11. updateMany: +5 % de salario a los CLERK del departamento 20
+==============================================================================
+Documentos modificados: 2
+ename  sal   
+-----  ------
+SMITH  840.0 
+ADAMS  1155.0
+
+Plan ganador para {deptno: 30}: IXSCAN deptno_1

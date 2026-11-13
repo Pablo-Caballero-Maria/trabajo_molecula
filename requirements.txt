@@ -1,0 +1,7 @@
+pymongo==4.20.0
+numpy==2.5.4
+pandas==3.1.1
+scikit-learn==1.9.1
+optuna==5.0.0
+plotly==7.1.0
+kaleido==1.5.1

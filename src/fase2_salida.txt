@@ -1,0 +1,41 @@
+
+### CDS16: {'n_molecules': 82, 'n_active': 41, 'n_inactive': 41, 'bits_total': 1024, 'bits_utiles': 772, 'bits_eliminados': 252, 'bits_por_mol_media': 41.853658536585364, 'bits_por_mol_min': 8, 'bits_por_mol_max': 82, 'densidad': 0.054214583596613165}
+     FP1  FP2  FP3  FP4  FP5  FP6  class
+1      0    0    0    0    0    0      0
+2.0    0    0    0    0    0    0      0
+3.0    0    1    0    0    0    0      0
+Validacion cruzada estratificada 10 folds x 5 repeticiones
+  LogReg (L2)        GMean=0.857+-0.117  Kappa=0.739  Acc=0.870  AUROC=0.949  (0.5 s)
+  SVM (RBF)          GMean=0.840+-0.134  Kappa=0.711  Acc=0.856  AUROC=0.947  (0.5 s)
+  k-NN (Jaccard)     GMean=0.752+-0.149  Kappa=0.554  Acc=0.777  AUROC=0.914  (2.6 s)
+  Bernoulli NB       GMean=0.831+-0.104  Kappa=0.685  Acc=0.843  AUROC=0.951  (0.5 s)
+  Random Forest      GMean=0.881+-0.115  Kappa=0.784  Acc=0.893  AUROC=0.959  (84.6 s)
+  Extra Trees        GMean=0.870+-0.123  Kappa=0.764  Acc=0.882  AUROC=0.957  (48.5 s)
+  Red neuronal (MLP) GMean=0.838+-0.132  Kappa=0.707  Acc=0.854  AUROC=0.942  (18.2 s)
+
+### CDS29: {'n_molecules': 7015, 'n_active': 1374, 'n_inactive': 5641, 'bits_total': 1024, 'bits_utiles': 1024, 'bits_eliminados': 0, 'bits_por_mol_media': 45.11261582323592, 'bits_por_mol_min': 13, 'bits_por_mol_max': 95, 'densidad': 0.04405528888987883}
+      FP1  FP2  FP3  FP4  FP5  FP6  class
+mol1    0    0    0    1    0    0      0
+mol2    0    0    0    0    0    0      0
+mol3    0    0    0    0    0    0      0
+Validacion cruzada estratificada 5 folds x 2 repeticiones
+  LogReg (L2)        GMean=0.627+-0.013  Kappa=0.198  Acc=0.668  AUROC=0.687  (5.8 s)
+  SVM (RBF)          GMean=0.643+-0.009  Kappa=0.256  Acc=0.721  AUROC=0.720  (168.2 s)
+  k-NN (Jaccard)     GMean=0.466+-0.027  Kappa=0.179  Acc=0.781  AUROC=0.682  (22.9 s)
+  Bernoulli NB       GMean=0.602+-0.011  Kappa=0.204  Acc=0.707  AUROC=0.681  (2.1 s)
+  Random Forest      GMean=0.376+-0.017  Kappa=0.148  Acc=0.802  AUROC=0.721  (24.9 s)
+  Extra Trees        GMean=0.436+-0.020  Kappa=0.172  Acc=0.791  AUROC=0.711  (16.9 s)
+  Red neuronal (MLP) GMean=0.630+-0.012  Kappa=0.229  Acc=0.702  AUROC=0.699  (73.3 s)
+
+### CDS29: Optuna (TPE, 40 pruebas, metrica GMean) y test hold-out 80/20
+  LogReg (L2)        best={'C': 0.0122}  CV-GMean=0.623 (prueba 22; 8 podadas; 42 s)
+                     test: GMean=0.643 Kappa=0.221 Acc=0.677 AUROC=0.711  CM=[[163, 112], [341, 787]]
+  SVM (RBF)          best={'C': 1.2438, 'gamma': 0.0107}  CV-GMean=0.638 (prueba 35; 8 podadas; 785 s)
+                     test: GMean=0.665 Kappa=0.264 Acc=0.705 AUROC=0.725  CM=[[167, 108], [306, 822]]
+  Random Forest      best={'max_features': 0.0454, 'min_samples_leaf': 28}  CV-GMean=0.617 (prueba 38; 6 podadas; 229 s)
+                     test: GMean=0.632 Kappa=0.238 Acc=0.713 AUROC=0.717  CM=[[145, 130], [273, 855]]
+  Red neuronal (MLP) best={'capas_ocultas': 1, 'neuronas': 96, 'alpha': 4.9517, 'learning_rate_init': 0.009}  CV-GMean=0.628 (prueba 24; 7 podadas; 561 s)
+                     test: GMean=0.651 Kappa=0.200 Acc=0.601 AUROC=0.709  CM=[[207, 68], [492, 636]]
+  Bits mas relevantes (RF): ['FP379', 'FP111', 'FP98', 'FP831', 'FP695', 'FP413', 'FP722', 'FP832', 'FP363', 'FP756']
+
+Resultados guardados en fase2_resultados.json y figuras fig_*.png / fig_*.html
