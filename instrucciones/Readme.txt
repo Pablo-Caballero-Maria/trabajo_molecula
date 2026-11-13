@@ -1,4 +1,4 @@
-// Desde la consola del contenedor portainer instalar:
+// Desde una terminal de la máquina local (instalación nativa) instalar:
 apt-get update
 apt-get install wget
 mkdir /home/mongodata

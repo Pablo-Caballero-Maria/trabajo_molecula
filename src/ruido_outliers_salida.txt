@@ -1,0 +1,30 @@
+### CDS29: Random Forest con los hiperparametros de Optuna {'max_features': 0.045414521454322114, 'min_samples_leaf': 28}
+Validacion cruzada estratificada de 5 folds sobre la particion de entrenamiento (5612 moleculas, 1099 activas)
+Ruido (copia ruidosa anadida al entrenamiento): Sin ruido, Gaussiano (σ = 0.15), Volteo de bits (p = 0.005), Enmascarado (p = 0.10)
+Outliers (5 % de cada clase, detectados antes de anadir ruido): Sin eliminar outliers, Isolation Forest, LOF (Jaccard)
+
+  fold 1/5 completado (73 s)
+  fold 2/5 completado (67 s)
+  fold 3/5 completado (69 s)
+  fold 4/5 completado (67 s)
+  fold 5/5 completado (66 s)
+
+Ruido                        Outliers               GMean           Kappa   MCC     AUROC   GMean2CP  Elim. 
+Sin ruido                    Sin eliminar outliers  0.625 ± 0.013  0.222   0.232   0.697   0.527     0
+Gaussiano (σ = 0.15)         Sin eliminar outliers  0.624 ± 0.012  0.234   0.242   0.708   0.527     0
+Volteo de bits (p = 0.005)   Sin eliminar outliers  0.630 ± 0.011  0.235   0.244   0.711   0.510     0
+Enmascarado (p = 0.10)       Sin eliminar outliers  0.624 ± 0.008  0.233   0.240   0.708   0.518     0
+Sin ruido                    Isolation Forest       0.610 ± 0.007  0.204   0.212   0.693   0.524     225
+Gaussiano (σ = 0.15)         Isolation Forest       0.614 ± 0.016  0.228   0.234   0.703   0.531     225
+Volteo de bits (p = 0.005)   Isolation Forest       0.625 ± 0.010  0.234   0.242   0.706   0.523     225
+Enmascarado (p = 0.10)       Isolation Forest       0.613 ± 0.014  0.225   0.231   0.705   0.530     225
+Sin ruido                    LOF (Jaccard)          0.619 ± 0.012  0.212   0.222   0.693   0.520     225
+Gaussiano (σ = 0.15)         LOF (Jaccard)          0.622 ± 0.023  0.230   0.237   0.704   0.524     225
+Volteo de bits (p = 0.005)   LOF (Jaccard)          0.628 ± 0.012  0.229   0.239   0.706   0.519     225
+Enmascarado (p = 0.10)       LOF (Jaccard)          0.622 ± 0.010  0.227   0.235   0.704   0.535     225
+
+Mejor combinacion en CV (GMean): Volteo de bits (p = 0.005) + Sin eliminar outliers
+  test base  Sin ruido + Sin eliminar outliers                  GMean=0.632 Kappa=0.238 Acc=0.713 AUROC=0.717
+  test mejor Volteo de bits (p = 0.005) + Sin eliminar outliers GMean=0.660 Kappa=0.289 Acc=0.738 AUROC=0.727
+
+Resultados guardados en ruido_outliers_resultados.json y figura fig_ruido_outliers.png / .html

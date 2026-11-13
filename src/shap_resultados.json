@@ -1,0 +1,192 @@
+{
+ "modelo": "Random Forest",
+ "best_params": {
+  "max_features": 0.045414521454322114,
+  "min_samples_leaf": 28
+ },
+ "explicador": "shap.TreeExplainer (tree_path_dependent), shap 0.54.1",
+ "n_test": 1403,
+ "test": {
+  "Accuracy": 0.7127583749109052,
+  "BalAcc": 0.6426257253384913,
+  "Sensitivity": 0.5272727272727272,
+  "Specificity": 0.7579787234042553,
+  "GMean": 0.6321878745310304,
+  "Kappa": 0.23838228182639865,
+  "MCC": 0.24759536040727817,
+  "F1": 0.4184704184704185,
+  "AUROC": 0.7170373952288845
+ },
+ "valor_base": 0.5000000000000004,
+ "error_aditividad_max": 1.0710197173580127e-09,
+ "top_bits": [
+  {
+   "bit": "FP379",
+   "media_abs_shap": 0.016349791683504,
+   "shap_medio_bit1": -0.014724088398671299,
+   "shap_medio_bit0": 0.019304131990278358,
+   "moleculas_test_bit1": 905,
+   "activas_entre_bit1": 0.15996649916247907,
+   "activas_entre_bit0": 0.25911330049261083
+  },
+  {
+   "bit": "FP98",
+   "media_abs_shap": 0.0063846558354008175,
+   "shap_medio_bit1": 0.061069424769249495,
+   "shap_medio_bit0": -0.0038136555049288275,
+   "moleculas_test_bit1": 63,
+   "activas_entre_bit1": 0.44651162790697674,
+   "activas_entre_bit0": 0.18584398740040764
+  },
+  {
+   "bit": "FP695",
+   "media_abs_shap": 0.005792977276191743,
+   "shap_medio_bit1": -0.024869474107073786,
+   "shap_medio_bit0": 0.0028412230340470325,
+   "moleculas_test_bit1": 188,
+   "activas_entre_bit1": 0.1279887482419128,
+   "activas_entre_bit0": 0.20567231177310752
+  },
+  {
+   "bit": "FP111",
+   "media_abs_shap": 0.005608358031921748,
+   "shap_medio_bit1": 0.06505419721813198,
+   "shap_medio_bit0": -0.0037738795265427425,
+   "moleculas_test_bit1": 42,
+   "activas_entre_bit1": 0.48186528497409326,
+   "activas_entre_bit0": 0.18564310758442518
+  },
+  {
+   "bit": "FP265",
+   "media_abs_shap": 0.004179872347775096,
+   "shap_medio_bit1": -0.019350330099636784,
+   "shap_medio_bit0": 0.0019613168432136264,
+   "moleculas_test_bit1": 179,
+   "activas_entre_bit1": 0.12686567164179105,
+   "activas_entre_bit0": 0.20518008903278026
+  },
+  {
+   "bit": "FP722",
+   "media_abs_shap": 0.004141365422397838,
+   "shap_medio_bit1": -0.02623821979662241,
+   "shap_medio_bit0": 0.0016919912241464988,
+   "moleculas_test_bit1": 140,
+   "activas_entre_bit1": 0.09641255605381166,
+   "activas_entre_bit0": 0.20441347270615565
+  },
+  {
+   "bit": "FP188",
+   "media_abs_shap": 0.004108918096080999,
+   "shap_medio_bit1": -0.019936796942625158,
+   "shap_medio_bit0": 0.001853316468926909,
+   "moleculas_test_bit1": 175,
+   "activas_entre_bit1": 0.12539184952978055,
+   "activas_entre_bit0": 0.20486529955770005
+  },
+  {
+   "bit": "FP756",
+   "media_abs_shap": 0.004098806912489177,
+   "shap_medio_bit1": -0.019755725337335422,
+   "shap_medio_bit0": 0.001882123587897434,
+   "moleculas_test_bit1": 174,
+   "activas_entre_bit1": 0.12322274881516587,
+   "activas_entre_bit0": 0.20506125728057842
+  },
+  {
+   "bit": "FP91",
+   "media_abs_shap": 0.004046403281774638,
+   "shap_medio_bit1": -0.012351067357772232,
+   "shap_medio_bit0": 0.002030869345430145,
+   "moleculas_test_bit1": 274,
+   "activas_entre_bit1": 0.14285714285714285,
+   "activas_entre_bit0": 0.20733029711559314
+  },
+  {
+   "bit": "FP832",
+   "media_abs_shap": 0.003742475264945721,
+   "shap_medio_bit1": -0.005198414346591372,
+   "shap_medio_bit0": 0.0026765476550577897,
+   "moleculas_test_bit1": 579,
+   "activas_entre_bit1": 0.1646234676007005,
+   "activas_entre_bit0": 0.21724759615384615
+  },
+  {
+   "bit": "FP562",
+   "media_abs_shap": 0.0036915106685707043,
+   "shap_medio_bit1": 0.007036522474137388,
+   "shap_medio_bit0": -0.0026627558728232713,
+   "moleculas_test_bit1": 330,
+   "activas_entre_bit1": 0.23481781376518218,
+   "activas_entre_bit0": 0.18482979209504227
+  },
+  {
+   "bit": "FP363",
+   "media_abs_shap": 0.0036693107437783526,
+   "shap_medio_bit1": 0.02247551662468177,
+   "shap_medio_bit0": -0.0023802334175930515,
+   "moleculas_test_bit1": 90,
+   "activas_entre_bit1": 0.2897196261682243,
+   "activas_entre_bit0": 0.1880787037037037
+  },
+  {
+   "bit": "FP361",
+   "media_abs_shap": 0.003420557754315685,
+   "shap_medio_bit1": -0.009617473093308643,
+   "shap_medio_bit0": 0.0017632373519790546,
+   "moleculas_test_bit1": 296,
+   "activas_entre_bit1": 0.13979496738117428,
+   "activas_entre_bit0": 0.20907688918263934
+  },
+  {
+   "bit": "FP185",
+   "media_abs_shap": 0.0034041370608006065,
+   "shap_medio_bit1": 0.018309251613660836,
+   "shap_medio_bit0": -0.0023337927002437986,
+   "moleculas_test_bit1": 94,
+   "activas_entre_bit1": 0.29545454545454547,
+   "activas_entre_bit0": 0.18735498839907191
+  },
+  {
+   "bit": "FP831",
+   "media_abs_shap": 0.0032697999748027996,
+   "shap_medio_bit1": -0.0680846692738623,
+   "shap_medio_bit0": 0.001367676150912574,
+   "moleculas_test_bit1": 40,
+   "activas_entre_bit1": 0.045454545454545456,
+   "activas_entre_bit0": 0.20007328691828508
+  }
+ ],
+ "top10_shap": [
+  "FP379",
+  "FP98",
+  "FP695",
+  "FP111",
+  "FP265",
+  "FP722",
+  "FP188",
+  "FP756",
+  "FP91",
+  "FP832"
+ ],
+ "top10_impureza": [
+  "FP379",
+  "FP111",
+  "FP98",
+  "FP831",
+  "FP695",
+  "FP413",
+  "FP722",
+  "FP832",
+  "FP363",
+  "FP756"
+ ],
+ "comunes_top10": [
+  "FP379",
+  "FP98",
+  "FP695",
+  "FP111",
+  "FP722",
+  "FP756",
+  "FP832"
+ ]
+}

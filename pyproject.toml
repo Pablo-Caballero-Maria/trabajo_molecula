@@ -1,0 +1,47 @@
+[project]
+name = "trabajo-molecula"
+version = "1.0.0"
+description = "Prácticas ADP (Apartado I): MongoDB, clasificación de la actividad biológica y cribado virtual"
+readme = "README.md"
+requires-python = ">=3.14"
+authors = [{ name = "Pablo Caballero María" }]
+dependencies = [
+    "kaleido>=1.5.1",
+    "numpy>=2.5.4",
+    "optuna>=5.0.0",
+    "pandas>=3.1.1",
+    "plotly>=7.1.0",
+    "pymongo>=4.20.0",
+    "scikit-learn>=1.9.1",
+    "shap>=0.54.1",
+]
+
+[tool.uv]
+package = false
+
+[dependency-groups]
+dev = [
+    "ruff>=0.17.5",
+    "ty>=0.0.103",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py314"
+# Material de la asignatura que se conserva tal cual se entregó
+extend-exclude = ["instrucciones", "**/screening_Mol-database-only_mongo_p.py"]
+
+[tool.ruff.lint]
+select = ["E", "W", "F", "I", "B", "UP", "NPY", "SIM", "C4"]
+# dict(...) es la forma habitual de pasar opciones a Plotly; y el formato con % se mantiene
+# porque reproduce exactamente las salidas *_salida.txt ya entregadas.
+ignore = ["C408", "UP031"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ty.environment]
+python-version = "3.14"
+
+[tool.ty.src]
+exclude = ["instrucciones", "**/screening_Mol-database-only_mongo_p.py"]
