@@ -1,0 +1,60 @@
+### CDS29: seleccion e ingenieria de caracteristicas
+Representaciones calculadas en 41 s (RDKit): 1024 bits de la BD, 1024 cuentas de subestructuras, 217 descriptores fisico-quimicos, 167 claves MACCS y 5 variables de similitud.
+Morgan (radio 2, 1024 bits) recalculado con RDKit reproduce mfp.bits: si
+Hiperparametros de Optuna: {'Random Forest': {'max_features': 0.045414521454322114, 'min_samples_leaf': 28}, 'LogReg (L2)': {'C': 0.012245161283742739}}
+Validacion cruzada estratificada de 5 particiones sobre el entrenamiento (5612 moleculas, 1099 activas); test reservado: 1403 moleculas.
+
+  particion 1/5 completada (108 s)
+  particion 2/5 completada (107 s)
+  particion 3/5 completada (101 s)
+  particion 4/5 completada (102 s)
+  particion 5/5 completada (100 s)
+
+## Seleccion de caracteristicas: GMean en validacion cruzada
+Criterio             Modelo                  16       32       64      128      256      512
+Chi cuadrado         Random Forest        0.577    0.594    0.601    0.613    0.627    0.617
+Chi cuadrado         LogReg (L2)          0.573    0.594    0.608    0.608    0.621    0.621
+Información mutua    Random Forest        0.565    0.599    0.605    0.613    0.627    0.623
+Información mutua    LogReg (L2)          0.572    0.591    0.597    0.608    0.620    0.627
+Importancia RF       Random Forest        0.576    0.588    0.612    0.619    0.621    0.626
+Importancia RF       LogReg (L2)          0.567    0.585    0.609    0.616    0.621    0.628
+Logística L1         Random Forest        0.535    0.596    0.612    0.624    0.622    0.618
+Logística L1         LogReg (L2)          0.536    0.596    0.615    0.623    0.624    0.630
+RFE (envolvente)     Random Forest        0.584    0.591    0.604    0.619    0.624    0.630
+RFE (envolvente)     LogReg (L2)          0.590    0.593    0.599    0.621    0.632    0.629
+1024 bits            Random Forest        0.625 (referencia)
+1024 bits            LogReg (L2)          0.632 (referencia)
+
+## Ingenieria de caracteristicas: GMean en validacion cruzada
+Espacio                                  Vars.    Random Forest   LogReg (L2)    
+Bits + similitud                         1029     0.635 ± 0.009  0.640 ± 0.016
+Filtro de frecuencia                     755      0.628 ± 0.010  0.630 ± 0.016
+Base: 1024 bits                          1024     0.625 ± 0.013  0.632 ± 0.018
+Frecuencia + redundancia                 753      0.619 ± 0.005  0.631 ± 0.016
+Bits + MACCS                             1191     0.619 ± 0.020  0.630 ± 0.018
+Cuentas de subestructuras                1024     0.618 ± 0.016  0.624 ± 0.008
+Claves MACCS                             167      0.613 ± 0.021  0.602 ± 0.019
+Todas las representaciones               2437     0.599 ± 0.016  0.636 ± 0.021
+Variables de similitud                   5        0.599 ± 0.029  0.607 ± 0.020
+Descriptores + MACCS + similitud         389      0.592 ± 0.020  0.627 ± 0.016
+Descriptores fisicoquímicos              217      0.590 ± 0.009  0.604 ± 0.014
+Cuentas + descriptores                   1241     0.589 ± 0.016  0.632 ± 0.014
+Bits + descriptores                      1241     0.586 ± 0.018  0.631 ± 0.010
+
+## Test reservado (1403 moleculas)
+  Random Forest      base         Base: 1024 bits                            1024 vars.  GMean=0.632 Kappa=0.238 Acc=0.713 AUROC=0.717
+  Random Forest      seleccion    RFE (envolvente), 512 bits                  512 vars.  GMean=0.637 Kappa=0.233 Acc=0.701 AUROC=0.716
+  Random Forest      ingenieria   Bits + similitud                           1029 vars.  GMean=0.625 Kappa=0.228 Acc=0.709 AUROC=0.720
+  LogReg (L2)        base         Base: 1024 bits                            1024 vars.  GMean=0.643 Kappa=0.221 Acc=0.677 AUROC=0.711
+  LogReg (L2)        seleccion    RFE (envolvente), 256 bits                  256 vars.  GMean=0.647 Kappa=0.224 Acc=0.676 AUROC=0.709
+  LogReg (L2)        ingenieria   Bits + similitud                           1029 vars.  GMean=0.669 Kappa=0.258 Acc=0.692 AUROC=0.723
+
+## Bits elegidos (primeros 16) por criterio
+  Chi cuadrado          7 bits en las 5 particiones: FP96, FP98, FP111, FP379, FP450, FP722, FP937
+  Información mutua     6 bits en las 5 particiones: FP96, FP98, FP111, FP379, FP722, FP937
+  Importancia RF        5 bits en las 5 particiones: FP98, FP111, FP379, FP695, FP831
+  Logística L1          5 bits en las 5 particiones: FP111, FP450, FP693, FP695, FP831
+  RFE (envolvente)      8 bits en las 5 particiones: FP98, FP111, FP363, FP379, FP450, FP693, FP695, FP831
+  Comunes a los cinco criterios: FP111
+
+Resultados guardados en seleccion_resultados.json y figuras fig_seleccion_cds29 / fig_ingenieria_cds29 (.png y .html)

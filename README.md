@@ -21,6 +21,9 @@ El trabajo tiene dos fases y una ampliación:
    - **ruido × outliers**: validación cruzada de 12 combinaciones de inyección de ruido y
      eliminación de outliers, con la frontera de decisión de cada una sobre dos componentes
      principales;
+   - **selección e ingeniería de características**: cinco criterios de selección de bits
+     (filtrado, embebidos y envolvente) frente a seis representaciones moleculares calculadas
+     con RDKit (cuentas, descriptores fisicoquímicos, claves MACCS y variables de similitud);
    - **explicabilidad con SHAP**: contribución de cada bit del fingerprint a la probabilidad de
      ser activa (gráfico de enjambre o *beeswarm*).
 3. **Ampliación · cribado virtual por similitud.** Búsqueda por coeficiente de Tanimoto con
@@ -70,6 +73,58 @@ Resultados (detalle en `src/ruido_outliers_salida.txt`):
   se solapan y la GMean del modelo 2D se queda en torno a 0,52. La información que separa
   activas de inactivas está repartida entre muchos bits, como confirma SHAP.
 
+## Selección e ingeniería de características
+
+`fase2_seleccion.py` responde a dos preguntas con el mismo protocolo: validación cruzada
+estratificada de 5 particiones sobre las 5612 moléculas de entrenamiento de CDS29, con el
+Random Forest y la regresión logística que ajustó Optuna, y el test reservado solo para la
+medición final. Todo el preprocesado —rankings, umbrales, transformación por cuantiles y
+variables de similitud— se ajusta **dentro** de cada partición de entrenamiento, de modo que
+la validación nunca ve información derivada de las moléculas que evalúa.
+
+**Selección**: cinco criterios de tres familias, evaluados conservando 16, 32, 64, 128, 256 y
+512 de los 1024 bits. Filtrado univariante (chi cuadrado e información mutua), selección
+embebida (importancia por impureza del Random Forest y magnitud de los coeficientes de una
+logística L1) y selección envolvente (eliminación recursiva de características, RFE).
+
+![Selección de características](src/fig_seleccion_cds29.png)
+
+**Ingeniería**: representaciones recalculadas con RDKit a partir del SMILES de cada molécula.
+Se comprueba que el fingerprint de Morgan de radio 2 y 1024 bits reproduce exactamente
+`mfp.bits` de MongoDB, así que las cuentas de subestructuras son la misma representación sin
+binarizar. A ellas se suman 217 descriptores fisicoquímicos (transformados por cuantiles),
+las 167 claves MACCS y 5 variables de similitud (máximo y media de los 5 vecinos más
+similares de cada clase, y su diferencia), solas y combinadas con los bits.
+
+![Espacios de representación](src/fig_ingenieria_cds29.png)
+
+Resultados (detalle en `src/seleccion_salida.txt`):
+
+- **El fingerprint se puede reducir a una cuarta parte sin coste medible**: con 256 bits el
+  mejor criterio llega a 0,627 en el Random Forest (referencia con 1024 bits: 0,625) y a
+  0,632 en la logística (referencia: 0,632). Por debajo de 64 bits la GMean cae con claridad,
+  hasta 0,535-0,590 con 16 bits.
+- **Ningún criterio domina.** El RFE, con diferencia el más caro, es el mejor con 16 bits
+  (0,584 y 0,590) y comparte el primer puesto en los tamaños grandes, pero chi cuadrado y la
+  información mutua se quedan a pocas milésimas —y a veces por delante— con una fracción del
+  coste. La logística L1 es la peor con 16 bits (0,535) y de las mejores a partir de 128.
+- **Los bits elegidos son estables y coinciden con SHAP**: FP111 está entre los 16 primeros
+  de los cinco criterios en las cinco particiones; FP98 y FP379 lo están en cuatro criterios,
+  y FP450, FP695 y FP831 en tres. Son los mismos bits que encabezan el análisis SHAP.
+- **La única representación que mejora a los bits es la similitud.** `Bits + similitud` gana
+  en validación cruzada con los dos modelos (RF 0,635; logística 0,640) y en el test lleva a
+  la logística hasta **GMean 0,669 y AUROC 0,723**, el mejor resultado de todo el trabajo (el
+  SVM de la fase 2 se quedaba en 0,665). Las cinco variables codifican el principio de
+  similitud de Johnson y Maggiora, lo que el k-NN hacía mal como clasificador y aquí funciona
+  como información añadida.
+- **Los descriptores fisicoquímicos no aportan y al Random Forest lo estorban**: solos dan
+  0,590 (RF) y 0,604 (logística), y unidos a los bits hunden al Random Forest hasta 0,586,
+  porque 217 variables continuas compiten con los bits en cada división del árbol. Las claves
+  MACCS, con solo 167 bits, llegan a 0,613: casi lo mismo que los 1024 de Morgan.
+- Para el Random Forest, la mejora de `Bits + similitud` no se confirma en el test (0,625
+  frente a 0,632 del caso base), un recordatorio de que un único test de 1403 moléculas tiene
+  su propio azar.
+
 ## Explicabilidad con SHAP
 
 `fase2_shap.py` reentrena una vez el Random Forest de Optuna (misma partición y semilla, de
@@ -97,6 +152,7 @@ src/
   fase1_emp_dept.py                       Fase 1: colecciones, validación, carga e informes
   fase2_clasificacion.py                  Fase 2: fingerprints, CV, Optuna, test y figuras
   fase2_ruido_outliers.py                 Fase 2: CV de combinaciones ruido × outliers
+  fase2_seleccion.py                      Fase 2: selección e ingeniería de características
   fase2_shap.py                           Fase 2: explicabilidad con SHAP
   screening_ampliado.py                   Ampliación: cribado con varios umbrales
   figuras_screening.py                    Figura del cribado (a partir de screening_resultados.json)
@@ -134,12 +190,13 @@ cd src
 uv run python fase1_emp_dept.py        > fase1_salida.txt
 uv run python fase2_clasificacion.py   > fase2_salida.txt      # CV + Optuna (~30 min)
 uv run python fase2_ruido_outliers.py  > ruido_outliers_salida.txt   # ~6 min
+uv run python fase2_seleccion.py       > seleccion_salida.txt  # ~12 min
 uv run python fase2_shap.py            > shap_salida.txt       # ~1 min
 uv run python screening_ampliado.py    > screening_salida.txt
 uv run python figuras_screening.py
 ```
 
-`fase2_ruido_outliers.py` y `fase2_shap.py` leen los hiperparámetros de
+`fase2_ruido_outliers.py`, `fase2_seleccion.py` y `fase2_shap.py` leen los hiperparámetros de
 `fase2_resultados.json`, de modo que no repiten la búsqueda de Optuna. Los scripts usan por
 defecto `mongodb://adp:adp@127.0.0.1:27017/?authSource=admin`; los de la fase 2 admiten otra
 cadena de conexión en la variable de entorno `MONGO_URI`.
