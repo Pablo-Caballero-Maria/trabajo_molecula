@@ -10,11 +10,14 @@ Autor: Pablo Caballero Maria
 """
 
 import json
+import os
 from time import time
 
 import pymongo
 
-CONNECTION = 'mongodb://adp:adp@127.0.0.1:27017/?authSource=admin'
+CONNECTION = os.environ.get('MONGO_URI', 'mongodb://adp:adp@127.0.0.1:27017/?authSource=admin')
+BASES = ['CDS16', 'CDS29']
+UMBRALES = [0.8, 0.6, 0.4, 0.3]
 QMOL = 'Nc1nc2c(ncn2C2OC(CO)C(O)C2O)c(=O)[nH]1'  # guanosina (molecula de consulta)
 QFP = [
     71,
@@ -63,15 +66,36 @@ QFP = [
 ]
 
 
+def bits_requeridos(db, qfp, qmin):
+    """Los qn - qmin + 1 bits de la consulta menos frecuentes en la coleccion (mfp_counts).
+
+    Una molecula con Tanimoto >= T comparte al menos qmin bits con la consulta, asi que tiene
+    que contener al menos uno de estos: es un filtro exacto, no una aproximacion.
+    """
+    return [
+        c['_id']
+        for c in db.mfp_counts.find({'_id': {'$in': qfp}})
+        .sort('count', 1)
+        .limit(len(qfp) - qmin + 1)
+    ]
+
+
+def candidatos(db, qfp, qmin, qmax):
+    """Moleculas que superan los dos filtros previos y en las que se calcula el Tanimoto."""
+    return db.molecules.count_documents(
+        {
+            'mfp.count': {'$gte': qmin, '$lte': qmax},
+            'mfp.bits': {'$in': bits_requeridos(db, qfp, qmin)},
+        }
+    )
+
+
 def similares_agregacion(db, qfp, threshold):
     """Pipeline del ejemplo de la asignatura: count bounds + required bits + Tanimoto."""
     qn = len(qfp)
     qmin = int(qn * threshold)
     qmax = int(qn / threshold)
-    reqbits = [
-        c['_id']
-        for c in db.mfp_counts.find({'_id': {'$in': qfp}}).sort('count', 1).limit(qn - qmin + 1)
-    ]
+    reqbits = bits_requeridos(db, qfp, qmin)
     pipeline = [
         {'$match': {'mfp.count': {'$gte': qmin, '$lte': qmax}, 'mfp.bits': {'$in': reqbits}}},
         {
@@ -111,71 +135,69 @@ def similares_fuerza_bruta(db, qfp, threshold):
     return res
 
 
-client = pymongo.MongoClient(CONNECTION)
-resumen = []
-print('Molecula de consulta:', QMOL, '| bits a 1:', len(QFP), '\n')
+def main(connection=CONNECTION, bases=BASES, salida='screening_resultados.json'):
+    client = pymongo.MongoClient(connection)
+    resumen = []
+    print('Molecula de consulta:', QMOL, '| bits a 1:', len(QFP), '\n')
 
-for db_name in ['CDS16', 'CDS29']:
-    db = client[db_name]
-    n_total = db.molecules.count_documents({})
-    print('=' * 78)
-    print('%s  (%d moleculas)' % (db_name, n_total))
-    print('=' * 78)
-    for threshold in [0.8, 0.6, 0.4, 0.3]:
-        t0 = time()
-        res, n_reqbits, qmin, qmax = similares_agregacion(db, QFP, threshold)
-        t_agg = time() - t0
+    for db_name in bases:
+        db = client[db_name]
+        n_total = db.molecules.count_documents({})
+        print('=' * 78)
+        print('%s  (%d moleculas)' % (db_name, n_total))
+        print('=' * 78)
+        for threshold in UMBRALES:
+            t0 = time()
+            res, n_reqbits, qmin, qmax = similares_agregacion(db, QFP, threshold)
+            t_agg = time() - t0
 
-        t0 = time()
-        res_fb = similares_fuerza_bruta(db, QFP, threshold)
-        t_fb = time() - t0
+            t0 = time()
+            res_fb = similares_fuerza_bruta(db, QFP, threshold)
+            t_fb = time() - t0
 
-        # numero de documentos que superan el filtro previo (candidatos evaluados)
-        reqbits = [
-            c['_id']
-            for c in db.mfp_counts.find({'_id': {'$in': QFP}})
-            .sort('count', 1)
-            .limit(len(QFP) - qmin + 1)
-        ]
-        n_cand = db.molecules.count_documents(
-            {'mfp.count': {'$gte': qmin, '$lte': qmax}, 'mfp.bits': {'$in': reqbits}}
-        )
+            # numero de documentos que superan el filtro previo (candidatos evaluados)
+            n_cand = candidatos(db, QFP, qmin, qmax)
 
-        coincide = [r['_id'] for r in res] == [r['_id'] for r in res_fb]
-        resumen.append(
-            {
-                'db': db_name,
-                'n_total': n_total,
-                'threshold': threshold,
-                'qmin': qmin,
-                'qmax': qmax,
-                'req_bits': n_reqbits,
-                'candidatos': n_cand,
-                'recuperadas': len(res),
-                't_agregacion_ms': t_agg * 1000,
-                't_fuerza_bruta_ms': t_fb * 1000,
-                'mismo_resultado': coincide,
-            }
-        )
-        print(
-            '\n-- umbral T = %.1f  |  cota de bits [%d, %d]  |  required bits = %d'
-            % (threshold, qmin, qmax, n_reqbits)
-        )
-        print(
-            '   candidatos tras el filtro: %d de %d (%.1f %%)'
-            % (n_cand, n_total, 100.0 * n_cand / n_total)
-        )
-        print(
-            '   moleculas recuperadas: %d  |  agregacion %.1f ms  vs  fuerza bruta %.1f ms'
-            ' (x%.1f)  |  mismo resultado: %s'
-            % (len(res), t_agg * 1000, t_fb * 1000, t_fb / max(t_agg, 1e-9), coincide)
-        )
-        for r in res[:5]:
-            print('     %.4f  %-10s %s' % (r['tanimoto'], r['_id'], r['smiles']))
-        if len(res) > 5:
-            print('     ... (%d mas)' % (len(res) - 5))
+            coincide = [r['_id'] for r in res] == [r['_id'] for r in res_fb]
+            resumen.append(
+                {
+                    'db': db_name,
+                    'n_total': n_total,
+                    'threshold': threshold,
+                    'qmin': qmin,
+                    'qmax': qmax,
+                    'req_bits': n_reqbits,
+                    'candidatos': n_cand,
+                    'recuperadas': len(res),
+                    't_agregacion_ms': t_agg * 1000,
+                    't_fuerza_bruta_ms': t_fb * 1000,
+                    'mismo_resultado': coincide,
+                }
+            )
+            print(
+                '\n-- umbral T = %.1f  |  cota de bits [%d, %d]  |  required bits = %d'
+                % (threshold, qmin, qmax, n_reqbits)
+            )
+            print(
+                '   candidatos tras el filtro: %d de %d (%.1f %%)'
+                % (n_cand, n_total, 100.0 * n_cand / n_total)
+            )
+            print(
+                '   moleculas recuperadas: %d  |  agregacion %.1f ms  vs  fuerza bruta %.1f ms'
+                ' (x%.1f)  |  mismo resultado: %s'
+                % (len(res), t_agg * 1000, t_fb * 1000, t_fb / max(t_agg, 1e-9), coincide)
+            )
+            for r in res[:5]:
+                print('     %.4f  %-10s %s' % (r['tanimoto'], r['_id'], r['smiles']))
+            if len(res) > 5:
+                print('     ... (%d mas)' % (len(res) - 5))
 
-with open('screening_resultados.json', 'w') as f:
-    json.dump(resumen, f, indent=1)
-print('\nResumen guardado en screening_resultados.json')
-client.close()
+    with open(salida, 'w') as f:
+        json.dump(resumen, f, indent=1)
+    print('\nResumen guardado en %s' % salida)
+    client.close()
+    return resumen
+
+
+if __name__ == '__main__':
+    main()

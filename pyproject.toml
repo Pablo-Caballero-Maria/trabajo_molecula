@@ -1,6 +1,6 @@
 [project]
 name = "trabajo-molecula"
-version = "1.0.0"
+version = "1.1.0"
 description = "Prácticas ADP (Apartado I): MongoDB, clasificación de la actividad biológica y cribado virtual"
 readme = "README.md"
 requires-python = ">=3.14"
@@ -22,6 +22,8 @@ package = false
 
 [dependency-groups]
 dev = [
+    "pytest>=9.2.0",
+    "pytest-cov>=7.1.0",
     "ruff>=0.17.5",
     "ty>=0.0.103",
 ]
@@ -46,3 +48,20 @@ python-version = "3.14"
 
 [tool.ty.src]
 exclude = ["instrucciones", "**/screening_Mol-database-only_mongo_p.py"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "tests"]
+addopts = ["--import-mode=importlib", "-ra"]
+markers = ["mongo: tests de integración que necesitan un servidor MongoDB"]
+filterwarnings = ["ignore::DeprecationWarning", "ignore::FutureWarning"]
+
+[tool.coverage.run]
+source = ["src"]
+branch = true
+# Generador de la primera versión de la memoria (desfasado) y ejemplo de la asignatura sin cambios
+omit = ["src/build_doc.py", "src/screening_Mol-database-only_mongo_p.py"]
+
+[tool.coverage.report]
+show_missing = true
+skip_covered = true
