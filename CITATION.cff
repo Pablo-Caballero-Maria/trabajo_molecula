@@ -1,0 +1,23 @@
+cff-version: 1.2.0
+message: "Si usas este software, cítalo con estos metadatos."
+type: software
+title: "Prácticas ADP (Apartado I): MongoDB y predicción de la actividad biológica"
+abstract: "Diseño NoSQL en MongoDB de un esquema entidad-interrelación con relación reflexiva, predicción de la actividad biológica de compuestos a partir de fingerprints moleculares de 1024 bits (siete clasificadores, Optuna, ruido y outliers, selección e ingeniería de características con RDKit y SHAP) y cribado virtual por similitud de Tanimoto con el framework de agregación."
+authors:
+  - family-names: "Caballero María"
+    given-names: "Pablo"
+version: 1.1.0
+date-released: 2026-11-21
+license: MIT
+repository-code: "https://github.com/Pablo-Caballero-Maria/trabajo_molecula"
+url: "https://pablo-portfolio-woad.vercel.app/projects/molecular-activity"
+keywords:
+  - "quimioinformática"
+  - "QSAR"
+  - "aprendizaje automático"
+  - "MongoDB"
+  - "scikit-learn"
+  - "Optuna"
+  - "SHAP"
+  - "RDKit"
+  - "cribado virtual"

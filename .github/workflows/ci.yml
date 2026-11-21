@@ -1,0 +1,95 @@
+# Integración continua: lint, formato, tipos y tests (unitarios y de integración contra MongoDB) con
+# cobertura, en cada push y pull request. Los tests de integración restauran CDS16 y CDS29 desde
+# instrucciones/dump.tar y comprueban que se reproducen las salidas entregadas.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  calidad:
+    name: Lint, formato y tipos
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: Ruff (lint)
+        run: uv run ruff check --output-format=github
+      - name: Ruff (formato)
+        run: uv run ruff format --check
+      - name: ty (tipos)
+        run: uv run ty check
+
+  tests:
+    name: Tests y cobertura
+    runs-on: ubuntu-latest
+    outputs:
+      cobertura: ${{ steps.cobertura.outputs.porcentaje }}
+    services:
+      mongodb:
+        image: mongo:8
+        ports: ["27017:27017"]
+        options: >-
+          --health-cmd "mongosh --quiet --eval 'db.runCommand({ ping: 1 })'"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      MOLECULA_TEST_URI: mongodb://localhost:27017
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10.4.0
+        with:
+          enable-cache: true
+      - run: uv sync --locked
+      - name: pytest con cobertura
+        run: uv run pytest --cov --cov-report=term --cov-report=xml --cov-report=html
+      - name: Resumen de la cobertura
+        id: cobertura
+        run: |
+          {
+            echo "### Cobertura de los tests"
+            echo
+            uv run coverage report --format=markdown
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "porcentaje=$(uv run coverage report --format=total)" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v7
+        with:
+          name: cobertura
+          path: |
+            coverage.xml
+            htmlcov/
+          retention-days: 14
+
+  insignia:
+    name: Insignia de cobertura
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [calidad, tests]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Publica coverage.json en la rama badges
+        env:
+          PORCENTAJE: ${{ needs.tests.outputs.cobertura }}
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          color=$(awk -v p="$PORCENTAJE" 'BEGIN { print (p >= 90) ? "brightgreen" : (p >= 75) ? "green" : (p >= 60) ? "yellowgreen" : "orange" }')
+          mkdir insignias && cd insignias
+          printf '{"schemaVersion":1,"label":"coverage","message":"%s%%","color":"%s"}\n' "$PORCENTAJE" "$color" > coverage.json
+          git init -q -b badges
+          git add .
+          git -c user.name="github-actions[bot]" -c user.email="41898282+github-actions[bot]@users.noreply.github.com" \
+            commit -qm "Cobertura: ${PORCENTAJE} %"
+          git push -qf "https://x-access-token:${TOKEN}@github.com/${GITHUB_REPOSITORY}.git" badges

@@ -1,0 +1,30 @@
+name: "Propuesta de mejora"
+description: "Una idea para mejorar el proyecto."
+title: "[Idea] "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: "¿Qué problema resuelve?"
+      placeholder: "Cuando …, me encuentro con que …"
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: "Qué propones"
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: "Alternativas que has considerado"
+  - type: dropdown
+    id: help
+    attributes:
+      label: "¿Te gustaría implementarla?"
+      options:
+        - "Sí, abriré un pull request"
+        - "Podría ayudar"
+        - "No"

@@ -1,0 +1,26 @@
+name: "Un resultado no se reproduce"
+description: "Una métrica, tabla o figura distinta de la memoria o de los *_salida.txt."
+title: "[Resultado] "
+labels: ["question"]
+body:
+  - type: input
+    id: script
+    attributes:
+      label: "Script"
+      placeholder: "p. ej. fase2_seleccion.py"
+    validations:
+      required: true
+  - type: textarea
+    id: esperado
+    attributes:
+      label: "Qué dice la memoria o el fichero de salida"
+      placeholder: ""
+    validations:
+      required: true
+  - type: textarea
+    id: obtenido
+    attributes:
+      label: "Qué obtienes tú"
+      placeholder: ""
+    validations:
+      required: true

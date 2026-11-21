@@ -1,0 +1,66 @@
+name: "Informe de error"
+description: "Algo no funciona como debería."
+title: "[Error] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ¡Gracias por tomarte el tiempo de informar! Si es un problema de **seguridad**, no uses este formulario: sigue [SECURITY.md](../blob/main/SECURITY.md).
+  - type: dropdown
+    id: where
+    attributes:
+      label: "Dónde"
+      options:
+        - "Fase 1 (fase1_emp_dept.py)"
+        - "Fase 2: clasificación y Optuna"
+        - "Fase 2: ruido × outliers"
+        - "Fase 2: selección e ingeniería"
+        - "Fase 2: SHAP"
+        - "Ampliación: cribado"
+        - "Los tests"
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: "Qué ha pasado"
+      description: "Una descripción clara del problema, con capturas si ayudan."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: "Pasos para reproducirlo"
+      placeholder: |
+        1. Ve a …
+        2. Pulsa …
+        3. Fíjate en …
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: "Qué esperabas"
+    validations:
+      required: true
+  - type: input
+    id: env
+    attributes:
+      label: "Entorno"
+      placeholder: "p. ej. Arch Linux, Python 3.14.1, MongoDB 8.3, uv 0.9"
+  - type: textarea
+    id: logs
+    attributes:
+      label: "Registros o salida de la consola"
+      description: "Quita contraseñas, tokens o claves antes de pegarlo."
+      render: shell
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: "Antes de enviarlo"
+      options:
+        - label: "He buscado en los issues abiertos y cerrados y no está ya."
+          required: true
+        - label: "Acepto seguir el [código de conducta](../blob/main/CODE_OF_CONDUCT.md)."
+          required: true
