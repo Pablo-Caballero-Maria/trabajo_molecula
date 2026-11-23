@@ -12,8 +12,11 @@ Autor: Pablo Caballero Maria
 import json
 import os
 from time import time
+from typing import cast
 
 import pymongo
+
+from documentos import BD, Similar, frecuencias, moleculas
 
 CONNECTION = os.environ.get('MONGO_URI', 'mongodb://adp:adp@127.0.0.1:27017/?authSource=admin')
 BASES = ['CDS16', 'CDS29']
@@ -66,7 +69,7 @@ QFP = [
 ]
 
 
-def bits_requeridos(db, qfp, qmin):
+def bits_requeridos(db: BD, qfp, qmin):
     """Los qn - qmin + 1 bits de la consulta menos frecuentes en la coleccion (mfp_counts).
 
     Una molecula con Tanimoto >= T comparte al menos qmin bits con la consulta, asi que tiene
@@ -74,15 +77,16 @@ def bits_requeridos(db, qfp, qmin):
     """
     return [
         c['_id']
-        for c in db.mfp_counts.find({'_id': {'$in': qfp}})
+        for c in frecuencias(db)
+        .find({'_id': {'$in': qfp}})
         .sort('count', 1)
         .limit(len(qfp) - qmin + 1)
     ]
 
 
-def candidatos(db, qfp, qmin, qmax):
+def candidatos(db: BD, qfp, qmin, qmax):
     """Moleculas que superan los dos filtros previos y en las que se calcula el Tanimoto."""
-    return db.molecules.count_documents(
+    return moleculas(db).count_documents(
         {
             'mfp.count': {'$gte': qmin, '$lte': qmax},
             'mfp.bits': {'$in': bits_requeridos(db, qfp, qmin)},
@@ -90,7 +94,7 @@ def candidatos(db, qfp, qmin, qmax):
     )
 
 
-def similares_agregacion(db, qfp, threshold):
+def similares_agregacion(db: BD, qfp, threshold):
     """Pipeline del ejemplo de la asignatura: count bounds + required bits + Tanimoto."""
     qn = len(qfp)
     qmin = int(qn * threshold)
@@ -118,14 +122,16 @@ def similares_agregacion(db, qfp, threshold):
         {'$match': {'tanimoto': {'$gte': threshold}}},
         {'$sort': {'tanimoto': -1}},
     ]
-    return list(db.molecules.aggregate(pipeline)), len(reqbits), qmin, qmax
+    # El $project deja _id, tanimoto, smiles y class: documentos Similar, no Molecula
+    similares = cast('list[Similar]', list(moleculas(db).aggregate(pipeline)))
+    return similares, len(reqbits), qmin, qmax
 
 
-def similares_fuerza_bruta(db, qfp, threshold):
+def similares_fuerza_bruta(db: BD, qfp, threshold):
     """Recorrido completo de la coleccion, sin filtros previos: referencia de correccion."""
     q = set(qfp)
-    res = []
-    for doc in db.molecules.find({}, {'_id': 1, 'smiles': 1, 'mfp': 1}):
+    res: list[Similar] = []
+    for doc in moleculas(db).find({}, {'_id': 1, 'smiles': 1, 'mfp': 1}):
         b = set(doc['mfp']['bits'])
         common = len(q & b)
         t = common / (len(q) + len(b) - common)
@@ -142,7 +148,7 @@ def main(connection=CONNECTION, bases=BASES, salida='screening_resultados.json')
 
     for db_name in bases:
         db = client[db_name]
-        n_total = db.molecules.count_documents({})
+        n_total = moleculas(db).count_documents({})
         print('=' * 78)
         print('%s  (%d moleculas)' % (db_name, n_total))
         print('=' * 78)

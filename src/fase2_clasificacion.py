@@ -41,6 +41,8 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.svm import SVC
 from sklearn.utils.class_weight import compute_sample_weight
 
+from documentos import moleculas
+
 warnings.filterwarnings('ignore')
 optuna.logging.set_verbosity(optuna.logging.WARNING)
 SEED = 42
@@ -62,7 +64,7 @@ class MLPBalanceada(MLPClassifier):
 
 def cargar_dataset(client, db_name):
     """Matriz binaria n x p de fingerprints; se eliminan las columnas todo '0'."""
-    cur = client[db_name].molecules.find({}, {'_id': 1, 'class': 1, 'mfp.bits': 1})
+    cur = moleculas(client[db_name]).find({}, {'_id': 1, 'class': 1, 'mfp.bits': 1})
     ids, filas, y = [], [], []
     for doc in cur:
         ids.append(doc['_id'])

@@ -39,6 +39,7 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import QuantileTransformer
 
+from documentos import moleculas
 from fase2_clasificacion import (
     CONNECTION,
     N_BITS,
@@ -78,7 +79,7 @@ def representaciones(client, db_name):
     de cada subestructura de Morgan, los descriptores fisico-quimicos y las claves MACCS.
     """
     df, _ = cargar_dataset(client, db_name)
-    smiles = {d['_id']: d['smiles'] for d in client[db_name].molecules.find({}, {'smiles': 1})}
+    smiles = {d['_id']: d['smiles'] for d in moleculas(client[db_name]).find({}, {'smiles': 1})}
     ids = df.index.to_numpy()
     X = df.drop(columns='class').to_numpy()
     y = df['class'].to_numpy()

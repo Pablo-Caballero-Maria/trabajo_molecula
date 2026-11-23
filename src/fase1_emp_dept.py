@@ -16,6 +16,8 @@ from datetime import datetime
 import pymongo
 from pymongo.errors import WriteError
 
+from documentos import BD, Dept, Emp, departamentos, empleados
+
 CONNECTION = os.environ.get('MONGO_URI', 'mongodb://adp:adp@127.0.0.1:27017/?authSource=admin')
 DB_NAME = 'empresa'
 
@@ -61,14 +63,14 @@ EMP_SCHEMA = {
 }
 
 
-def crear_colecciones(db):
+def crear_colecciones(db: BD):
     """Colecciones dept y emp con validación estricta e índices sobre las referencias."""
     db.create_collection('dept', validator=DEPT_SCHEMA, validationLevel='strict')
     db.create_collection('emp', validator=EMP_SCHEMA, validationLevel='strict')
     # Índices sobre las referencias: aceleran $lookup y $graphLookup
-    db.emp.create_index('deptno')
-    db.emp.create_index('mgr')
-    db.emp.create_index('job')
+    empleados(db).create_index('deptno')
+    empleados(db).create_index('mgr')
+    empleados(db).create_index('job')
 
 
 # ---------------------------------------------------------------------------
@@ -78,7 +80,7 @@ def d(s):
     return datetime.strptime(s, '%Y-%m-%d')
 
 
-DEPTS = [
+DEPTS: list[Dept] = [
     {'_id': 10, 'dname': 'ACCOUNTING', 'loc': 'NEW YORK'},
     {'_id': 20, 'dname': 'RESEARCH', 'loc': 'DALLAS'},
     {'_id': 30, 'dname': 'SALES', 'loc': 'CHICAGO'},
@@ -109,9 +111,9 @@ EMPS_RAW = [
 ]
 
 
-def documento_emp(empno, ename, job, mgr, hd, sal, comm, deptno):
+def documento_emp(empno, ename, job, mgr, hd, sal, comm, deptno) -> Emp:
     """Documento de un empleado: los atributos opcionales ausentes no se guardan."""
-    doc = {'_id': empno, 'ename': ename, 'job': job, 'hiredate': d(hd), 'sal': sal}
+    doc: Emp = {'_id': empno, 'ename': ename, 'job': job, 'hiredate': d(hd), 'sal': sal}
     if comm is not None:
         doc['comm'] = comm
     if deptno is not None:
@@ -121,15 +123,15 @@ def documento_emp(empno, ename, job, mgr, hd, sal, comm, deptno):
     return doc
 
 
-def cargar_datos(db):
-    db.dept.insert_many(DEPTS)
-    db.emp.insert_many([documento_emp(*fila) for fila in EMPS_RAW])
+def cargar_datos(db: BD):
+    departamentos(db).insert_many(DEPTS)
+    empleados(db).insert_many([documento_emp(*fila) for fila in EMPS_RAW])
 
 
-def prueba_validacion(db):
+def prueba_validacion(db: BD):
     """Inserta un empleado con salario negativo y explica por qué lo rechaza el esquema."""
     try:
-        db.emp.insert_one(
+        empleados(db).insert_one(
             {'_id': 9999, 'ename': 'ERROR', 'job': 'CLERK', 'hiredate': d('2025-01-01'), 'sal': -10}
         )
     except WriteError as e:
@@ -144,14 +146,18 @@ def prueba_validacion(db):
     return None
 
 
-def referencias_huerfanas(db):
+def referencias_huerfanas(db: BD):
     """Integridad referencial (MongoDB no la impone): comprobación explícita."""
-    ids_dept = set(db.dept.distinct('_id'))
-    ids_emp = set(db.emp.distinct('_id'))
+    ids_dept = set(departamentos(db).distinct('_id'))
+    ids_emp = set(empleados(db).distinct('_id'))
     bad_dept = [
-        e['_id'] for e in db.emp.find({'deptno': {'$exists': True}}) if e['deptno'] not in ids_dept
+        e['_id']
+        for e in empleados(db).find({'deptno': {'$exists': True}})
+        if e['deptno'] not in ids_dept
     ]
-    bad_mgr = [e['_id'] for e in db.emp.find({'mgr': {'$exists': True}}) if e['mgr'] not in ids_emp]
+    bad_mgr = [
+        e['_id'] for e in empleados(db).find({'mgr': {'$exists': True}}) if e['mgr'] not in ids_emp
+    ]
     return bad_dept, bad_mgr
 
 
@@ -190,10 +196,10 @@ def concatenar(campo):
     }
 
 
-def q1(db):
+def q1(db: BD):
     """Q1. Listado de empleados con el nombre y la localidad de su departamento."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {
                     '$lookup': {
@@ -221,10 +227,10 @@ def q1(db):
     )
 
 
-def q2(db):
+def q2(db: BD):
     """Q2. Informe por departamento (incluye los departamentos vacíos)."""
     return list(
-        db.dept.aggregate(
+        departamentos(db).aggregate(
             [
                 {
                     '$lookup': {
@@ -252,10 +258,10 @@ def q2(db):
     )
 
 
-def q3(db):
+def q3(db: BD):
     """Q3. Empleados con su jefe directo (auto-referencia)."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {
                     '$lookup': {
@@ -282,10 +288,10 @@ def q3(db):
     )
 
 
-def q4(db):
+def q4(db: BD):
     """Q4. Número de subordinados directos de cada jefe."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {'$match': {'mgr': {'$exists': True}}},
                 {
@@ -312,10 +318,10 @@ def q4(db):
     )
 
 
-def q5(db, ename='JONES'):
+def q5(db: BD, ename='JONES'):
     """Q5. Jerarquía completa bajo un jefe con $graphLookup (subordinados a cualquier nivel)."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {'$match': {'ename': ename}},
                 {
@@ -344,10 +350,10 @@ def q5(db, ename='JONES'):
     )
 
 
-def q6(db, ename='ADAMS'):
+def q6(db: BD, ename='ADAMS'):
     """Q6. Cadena de mando ascendente de un empleado, hasta el presidente."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {'$match': {'ename': ename}},
                 {
@@ -375,10 +381,10 @@ def q6(db, ename='ADAMS'):
     )
 
 
-def q7(db):
+def q7(db: BD):
     """Q7. Empleados que ganan lo mismo o más que su jefe."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {
                     '$lookup': {
@@ -404,18 +410,20 @@ def q7(db):
     )
 
 
-def q8(db):
+def q8(db: BD):
     """Q8. Retribución total (sal + comm) de los vendedores."""
-    vendedores = db.emp.find({'job': 'SALESMAN'}, {'_id': 0, 'ename': 1, 'sal': 1, 'comm': 1}).sort(
-        'comm', -1
+    vendedores = (
+        empleados(db)
+        .find({'job': 'SALESMAN'}, {'_id': 0, 'ename': 1, 'sal': 1, 'comm': 1})
+        .sort('comm', -1)
     )
     return [{**r, 'total': r['sal'] + r.get('comm', 0)} for r in vendedores]
 
 
-def q9(db):
+def q9(db: BD):
     """Q9. Contrataciones por año y puesto."""
     return list(
-        db.emp.aggregate(
+        empleados(db).aggregate(
             [
                 {
                     '$group': {
@@ -438,13 +446,13 @@ def q9(db):
     )
 
 
-def q10(db):
+def q10(db: BD):
     """Q10. Casos límite de las cardinalidades mínimas 0: sin departamento, sin jefe, vacíos."""
-    sin_dept = [e['ename'] for e in db.emp.find({'deptno': {'$exists': False}})]
-    sin_jefe = [e['ename'] for e in db.emp.find({'mgr': {'$exists': False}})]
+    sin_dept = [e['ename'] for e in empleados(db).find({'deptno': {'$exists': False}})]
+    sin_jefe = [e['ename'] for e in empleados(db).find({'mgr': {'$exists': False}})]
     dept_vacios = [
         r['dname']
-        for r in db.dept.aggregate(
+        for r in departamentos(db).aggregate(
             [
                 {
                     '$lookup': {
@@ -461,19 +469,22 @@ def q10(db):
     return sin_dept, sin_jefe, dept_vacios
 
 
-def q11(db):
+def q11(db: BD):
     """Q11. Subida del 5 % a los CLERK de RESEARCH (updateMany con pipeline)."""
-    res = db.emp.update_many(
+    res = empleados(db).update_many(
         {'deptno': 20, 'job': 'CLERK'},
         [{'$set': {'sal': {'$round': [{'$multiply': ['$sal', 1.05]}, 2]}}}],
     )
-    filas = list(db.emp.find({'deptno': 20, 'job': 'CLERK'}, {'_id': 0, 'ename': 1, 'sal': 1}))
+    filas = list(
+        empleados(db).find({'deptno': 20, 'job': 'CLERK'}, {'_id': 0, 'ename': 1, 'sal': 1})
+    )
     return res.modified_count, filas
 
 
-def etapa_indice(db, filtro):
+def etapa_indice(db: BD, filtro):
     """Etapa del plan ganador de una búsqueda: IXSCAN (con su índice) si usa uno."""
-    stage = db.emp.find(filtro).explain()['queryPlanner']['winningPlan']
+    # explain() devuelve el plan de la consulta, no empleados: sobre la colección sin tipar
+    stage = db['emp'].find(filtro).explain()['queryPlanner']['winningPlan']
     while 'inputStage' in stage:
         if stage.get('stage') == 'IXSCAN':
             break
@@ -489,8 +500,8 @@ def main(connection=CONNECTION, db_name=DB_NAME):
     crear_colecciones(db)
     cargar_datos(db)
     print(
-        f'Cargados {db.dept.count_documents({})} departamentos y '
-        f'{db.emp.count_documents({})} empleados.\n'
+        f'Cargados {departamentos(db).count_documents({})} departamentos y '
+        f'{empleados(db).count_documents({})} empleados.\n'
     )
     rechazo = prueba_validacion(db)
     if rechazo is not None:
