@@ -7,6 +7,18 @@ repositorio.
 
 ## [Sin publicar]
 
+## [1.2.0] - 2026-11-22
+
+### Añadido
+
+- **Consultas tipadas**: `src/documentos.py` declara el documento de cada colección como un `TypedDict` (`Dept` y
+  `Emp`, con los mismos campos obligatorios y opcionales que sus validadores `$jsonSchema`; `Molecula`, cuyo campo
+  `class` obliga a la sintaxis funcional, y `FrecuenciaBit`) y da cada colección como un `Collection[...]` de
+  PyMongo de ese tipo; los scripts las usan así (`empleados(db)`, `moleculas(db)`…). `ty` encontró tres cosas que
+  ahora están tipadas: los departamentos de la carga, el plan de `explain()` (que no es un empleado) y los
+  resultados del cribado (`Similar`). Las consultas y las salidas entregadas no cambian.
+- Tests del esquema frente a los validadores y al volcado (77 en total: 51 unitarios y 26 de integración).
+
 ## [1.1.0] - 2026-11-21
 
 ### Añadido
@@ -60,7 +72,8 @@ Versión entregada.
 - Ampliación: cribado virtual por similitud de Tanimoto con el framework de agregación, comparado con
   una búsqueda exhaustiva.
 
-[Sin publicar]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/compare/v1.1.0...HEAD
+[Sin publicar]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/compare/v1.0.0...v1.1.0
 [1.0.0]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/compare/v0.1.0...v1.0.0
 [0.1.0]: https://github.com/Pablo-Caballero-Maria/trabajo_molecula/releases/tag/v0.1.0

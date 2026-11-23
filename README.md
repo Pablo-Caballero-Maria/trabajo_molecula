@@ -20,7 +20,7 @@ Diseño y Procesamiento de Datos Aplicados a las Ciencias y a las Tecnologías (
 ![SHAP](https://img.shields.io/badge/SHAP-TreeExplainer-FF0D57)
 ![RDKit](https://img.shields.io/badge/RDKit-2026.09-0B7285)
 ![Plotly](https://img.shields.io/badge/Plotly-figuras-3F4F75?logo=plotly&logoColor=white)
-![pytest](https://img.shields.io/badge/pytest-74_tests-0A9EDC?logo=pytest&logoColor=white)
+![pytest](https://img.shields.io/badge/pytest-77_tests-0A9EDC?logo=pytest&logoColor=white)
 ![uv · Ruff · ty](https://img.shields.io/badge/uv_·_Ruff_·_ty-Astral-DE5FE9?logo=astral&logoColor=white)
 
 [Memoria (PDF)](entregables/Pr%C3%A1cticas%20ADP%20%28Apartado%20I%29%20-%20Pablo%20Caballero%20Mar%C3%ADa.pdf) ·
@@ -254,6 +254,8 @@ filtros dejan pasar el 72 % y la ventaja desaparece.
 
 ```
 src/
+  documentos.py                           Esquema tipado: el TypedDict de cada colección y sus
+                                          Collection[...] (dept, emp, molecules, mfp_counts)
   fase1_emp_dept.py                       Fase 1: colecciones, validación, carga e informes
   fase2_clasificacion.py                  Fase 2: fingerprints, CV, Optuna, test y figuras
   fase2_ruido_outliers.py                 Fase 2: CV de combinaciones ruido × outliers
@@ -271,6 +273,11 @@ instrucciones/                            Enunciado, teoría, Readme y copia de 
 entregables/                              Memoria (PDF y DOCX) y zip de la entrega
 pyproject.toml, uv.lock, .python-version  Proyecto de uv: dependencias, versiones fijadas y Python
 ```
+
+Las consultas están tipadas: cada colección se usa como un `Collection[...]` de PyMongo con el `TypedDict` de su
+documento (`src/documentos.py`): `Dept` y `Emp` con los campos que exigen sus validadores `$jsonSchema`, y
+`Molecula` y `FrecuenciaBit` con los del volcado. `ty` comprueba así los documentos que se cargan y los campos que
+se leen de cada consulta; las consultas son las mismas que se entregaron.
 
 ## Cómo reproducirlo (en nativo)
 
@@ -313,8 +320,8 @@ uv run python figuras_screening.py
 ## Tests
 
 ```bash
-uv run pytest                 # 74 tests; los de integración se saltan si no hay MongoDB
-uv run pytest -m "not mongo"  # solo los 48 unitarios (unos 3 s)
+uv run pytest                 # 77 tests; los de integración se saltan si no hay MongoDB
+uv run pytest -m "not mongo"  # solo los 51 unitarios (unos 3 s)
 uv run pytest --cov           # con cobertura
 ```
 

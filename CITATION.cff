@@ -6,8 +6,8 @@ abstract: "Diseño NoSQL en MongoDB de un esquema entidad-interrelación con rel
 authors:
   - family-names: "Caballero María"
     given-names: "Pablo"
-version: 1.1.0
-date-released: 2026-11-21
+version: 1.2.0
+date-released: 2026-11-22
 license: MIT
 repository-code: "https://github.com/Pablo-Caballero-Maria/trabajo_molecula"
 url: "https://pablo-portfolio-woad.vercel.app/projects/molecular-activity"
