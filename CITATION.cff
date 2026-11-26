@@ -10,7 +10,7 @@ version: 1.2.0
 date-released: 2026-11-22
 license: MIT
 repository-code: "https://github.com/Pablo-Caballero-Maria/trabajo_molecula"
-url: "https://pablo-portfolio-woad.vercel.app/projects/molecular-activity"
+url: "https://pablo-caballero.vercel.app/projects/molecular-activity"
 keywords:
   - "quimioinformática"
   - "QSAR"

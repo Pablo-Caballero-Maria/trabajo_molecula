@@ -53,7 +53,7 @@ espacios públicos.
 ## Aplicación
 
 Los casos de comportamiento abusivo, acosador o inaceptable de cualquier otro modo pueden reportarse:
-comunícalo en privado al mantenedor, [@Pablo-Caballero-Maria](https://github.com/Pablo-Caballero-Maria), por los medios de contacto de su [portfolio](https://pablo-portfolio-woad.vercel.app/#contact). Todas las quejas serán revisadas e investigadas con prontitud y de forma justa, y se
+comunícalo en privado al mantenedor, [@Pablo-Caballero-Maria](https://github.com/Pablo-Caballero-Maria), por los medios de contacto de su [portfolio](https://pablo-caballero.vercel.app/#contact). Todas las quejas serán revisadas e investigadas con prontitud y de forma justa, y se
 respetará la privacidad y la seguridad de quien informe del incidente.
 
 ## Guías de aplicación

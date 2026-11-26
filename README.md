@@ -26,7 +26,7 @@ Diseño y Procesamiento de Datos Aplicados a las Ciencias y a las Tecnologías (
 [Memoria (PDF)](entregables/Pr%C3%A1cticas%20ADP%20%28Apartado%20I%29%20-%20Pablo%20Caballero%20Mar%C3%ADa.pdf) ·
 [Wiki](https://github.com/Pablo-Caballero-Maria/trabajo_molecula/wiki) ·
 [Registro de cambios](CHANGELOG.md) ·
-[Resumen en mi portfolio](https://pablo-portfolio-woad.vercel.app/projects/molecular-activity)
+[Resumen en mi portfolio](https://pablo-caballero.vercel.app/projects/molecular-activity)
 
 <img src="src/fig_shap_cds29.png" alt="Gráfico de enjambre de SHAP: cuánto empuja cada bit del fingerprint a una molécula hacia activa o inactiva" width="640">
 
